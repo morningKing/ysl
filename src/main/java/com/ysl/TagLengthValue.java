@@ -28,4 +28,9 @@ public class TagLengthValue {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "{tag=[" + tag + "]" + "length=[" + len + "]" + "value=[" + value + "]}";
+    }
 }

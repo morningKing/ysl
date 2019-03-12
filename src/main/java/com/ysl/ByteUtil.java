@@ -288,8 +288,36 @@ public class ByteUtil {
 //        byte[] bytes7 = new byte[5];
 //        System.out.println(bytes7.length);
 //        System.out.println(hex2bytes("34")[0]);
-        System.out.println(bytes2bcd(hex2bytes("011022")));
+//        System.out.println(bytes2bcd(hex2bytes("011022")));
 
 //        System.out.println(Long.MAX_VALUE);
+        /**
+         * 9F
+         * 1001 1111
+         * 0001 1111
+         * 0001 1111
+         *
+         */
+//        System.out.println(hex2bytes("9F")[0] & 0x1F);
+        /**
+         * 01111111
+         * 2^7-1=127
+         * 7F
+         *
+         */
+//        System.out.println((hex2bytes("FF")[0]&0xFF) >> 7);
+
+        /**
+         * 10000001
+         * 81
+         */
+//        System.out.println(hex2bytes("81")[0]&0x0F);
+
+        /**
+         * 11111111
+         * FF
+         * -1
+         */
+        System.out.println(bytes2int(hex2bytes("FF")));
     }
 }
