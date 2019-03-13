@@ -3,7 +3,7 @@ package com.ysl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TlvDeocder {
+public class TlvDecoder {
 
     public static List<TagLengthValue> parse(byte[] bytes) {
         List<TagLengthValue> list = new ArrayList<>();

@@ -1,16 +1,24 @@
 package com.ysl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class BcomDecoder {
+public class BcomDecoder{
 
-    private static final int VAR = 1;
-    private static final int STATIC = 0;
+    public static final int VAR = 1;
+    public static final int STATIC = 0;
 
-    private static final int ASCII = 1;
-    private static final int BCD = 0;
-    private static final int TLV = 3;
+    public static final int ASCII = 1;
+    public static final int BCD = 0;
+    public static final int TLV = 3;
+
+    private static List<Field> list = new ArrayList<>();
+
+    static {
+
+    }
 
     public static Map<String, String> parse(byte[] bytes) {
         if (checkLength(bytes))
@@ -68,7 +76,7 @@ public class BcomDecoder {
                     fieldValue = String.valueOf(ByteUtil.bytes2bcd(value));
                     break;
                 case TLV:
-                    fieldValue = null;
+                    fieldValue = TlvDecoder.format(value);
                     break;
                 default:
                     throw new RuntimeException("");
@@ -113,6 +121,25 @@ public class BcomDecoder {
         byte[] head = new byte[2];
         System.arraycopy(bytes, 0, head, 0, 2);
         return ByteUtil.bytes2int(head) == (bytes.length - 2);
+    }
+
+    public static void main(String[] args) {
+        /**
+         * 0166
+         * 00000001 01100110
+         * 2+4+32+64+128=230
+         */
+        String str16 = "00A660068800006040001804240200702406C024C0981D166258000000000253000000000000000115001726270407100001061220376258000000000253D2704201000004760000003030313932363736303030353633343233333332303739323932323031313536000000000000000024000000000000000013200000040006000016000000000000030200180010D2717312A2737E9377BC7E5C1A6F4C433546444244343032";
+        byte[] bytes = ByteUtil.hex2bytes(str16);
+        byte[] head = new byte[2];
+        System.arraycopy(bytes, 0, head, 0, 2);
+        System.out.println(ByteUtil.bytes2int(head));
+        System.out.println(bytes.length - 2);
+        if (checkLength(bytes)) {
+            System.out.println("length true");
+        } else {
+            System.out.println("length false");
+        }
     }
 
 }
