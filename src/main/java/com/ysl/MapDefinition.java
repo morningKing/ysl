@@ -6,16 +6,16 @@ import java.util.*;
 
 public class MapDefinition {
 
-    private static final String VAR2 = "VAR2";
+    private static final String VAR2 = "VAR2"; //变长 2字节长度
 
-    private static final String VAR3 = "VAR3";
+    private static final String VAR3 = "VAR3"; //变长 3字节长度
 
-    public static List<Field> definitionInit(String path) {
+    public static Map<String, Field> definitionInit(String path) {
         File file = new File(path);
-        if (file.exists()) {
+        if (!file.exists()) {
             throw new RuntimeException("8583 config file is not found");
         }
-        List<Field> list = new ArrayList<>(); //域表
+        Map<String, Field> fieldMap = new HashMap<>();
         Map<String, String> map;
         Properties properties = new Properties();
         try {
@@ -25,37 +25,56 @@ public class MapDefinition {
             fileInputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException("load 8583 config error");
         }
         Set<String> keys = map.keySet();
         try {
             for (String key : keys) {
                 Field field = new Field();
+                field.setName(key);
                 String[] vals = map.get(key).split(",");
-                if (VAR2.equals(vals[1])) { // 变长域 长度为2
+                if (VAR2.equals(vals[1].trim())) { // 变长域 长度为2 bcd压缩成1字节
+                    field.setLength(1);
+                    field.setVar(BcomDecoder.VAR);
+                } else if (VAR3.equals(vals[1].trim())) { //变长域 长度3 右靠bcd压缩成2字节
                     field.setLength(2);
                     field.setVar(BcomDecoder.VAR);
-                } else if (VAR3.equals(vals[1])) { //变长域 长度3
-                    field.setLength(3);
-                    field.setVar(BcomDecoder.VAR);
                 } else {// 定长域
-                    field.setVarLength(Integer.parseInt(vals[1]));
+                    int tmp = Integer.parseInt(vals[1]);
+                    if ("bcd".equals(vals[2].trim())) { // bcd码 半字节代表一位十进制数
+                        int len = tmp % 2 == 1 ? tmp + 1 : tmp; // 16进制bcd码长度无法是奇数
+                        field.setVarLength(len / 2);
+                    } else {
+                        field.setVarLength(tmp);
+                    }
                 }
 
-                if("true".equals(vals[2])){
-                    field.setType(BcomDecoder.BCD);
-                }else if("false".equals(vals[2])){
-                    field.setType(BcomDecoder.ASCII);
-                }else{
-                    field.setType(BcomDecoder.TLV);
+                switch (vals[2].trim()) {
+                    case "bcd":
+                        field.setType(BcomDecoder.BCD);
+                        break;
+                    case "asc":
+                        field.setType(BcomDecoder.ASCII);
+                        break;
+                    case "tlv":
+                        field.setType(BcomDecoder.TLV);
+                        break;
+                    case "zzz":
+                        field.setType(BcomDecoder.ZZZ);
+                        break;
+                    case "bin":
+                        field.setType(BcomDecoder.BIN);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("unknow value type");
                 }
 
-                list.add(field);
+                fieldMap.put(field.getName(), field);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("");
+            throw new RuntimeException("filed definition fail");
         }
-        return list;
+        return fieldMap;
     }
 }

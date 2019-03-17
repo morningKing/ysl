@@ -24,8 +24,9 @@ public class TlvDecoder {
             index += tagLength;
 
             byte[] keys = {bytes[index]};
-            if ((keys[0] & 0xFF) >> 7 == 1) { //最左bit为0则长度为单字节，后七位bit表子域长度 0~127
-
+            index += 1;
+            if ((keys[0] & 0xFF) >> 7 == 0) { //最左bit为0则长度为单字节，后七位bit表子域长度 0~127
+//                System.out.println("");
             } else if ((keys[0] & 0x0F) == 1) { //最左bit为1，低四位为1 后单字节表长度 127~255
                 index += 1;
                 keys[0] = bytes[index];
@@ -38,11 +39,13 @@ public class TlvDecoder {
                 throw new RuntimeException("tvl length should be limit 1 ~ 3 byte");
             }
             tlv.setLen(String.valueOf(ByteUtil.bytes2int(keys)));
-
+            if(index == 76) {
+                System.out.println("");
+            }
             byte[] value = new byte[Integer.valueOf(tlv.getLen())];
             System.arraycopy(bytes, index, value, 0, Integer.valueOf(tlv.getLen()));
             tlv.setValue(ByteUtil.bytes2hex(value));
-
+            index += Integer.valueOf(tlv.getLen());
             list.add(tlv);
         }
         return list;

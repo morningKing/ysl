@@ -70,7 +70,8 @@ public class ByteUtilTest {
      */
     @Test
     public void testDec2hex() throws Exception {
-        System.out.println(ByteUtil.dec2hex(328));
+//        System.out.println(ByteUtil.dec2hex(328));
+        System.out.println(ByteUtil.dec2hex(323));
     }
 
     /**

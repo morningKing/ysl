@@ -1,11 +1,9 @@
 package com.ysl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class BcomDecoder{
+public class BcomDecoder {
 
     public static final int VAR = 1;
     public static final int STATIC = 0;
@@ -13,26 +11,21 @@ public class BcomDecoder{
     public static final int ASCII = 1;
     public static final int BCD = 0;
     public static final int TLV = 3;
+    public static final int ZZZ = 4;
+    public static final int BIN = 5;
 
-    private static List<Field> list = new ArrayList<>();
+    private static final int SEC = 35;
+    private static final int THRD = 36;
+
+    private static Map<String, Field> fieldMap;
 
     static {
-
+        fieldMap = MapDefinition.definitionInit("src/main/resources/config_8583.properties");
     }
 
-    public static Map<String, String> parse(byte[] bytes) {
-        if (checkLength(bytes))
-            return null;
+    static Map<String, String> parse(byte[] body) {
+
         Map<String, String> map = new TreeMap<>();
-        /**
-         * len(2byte) tpdu(10byte) head(12byte) body
-         */
-        byte[] tpdu = new byte[10];
-        System.arraycopy(bytes, 2, tpdu, 0, 10);
-        byte[] head = new byte[12];
-        System.arraycopy(bytes, 12, head, 0, 12);
-        byte[] body = new byte[bytes.length - 24];
-        System.arraycopy(bytes, 24, body, 0, bytes.length - 24);
 
         int index = 0;
         byte[] msi = new byte[2];
@@ -45,24 +38,40 @@ public class BcomDecoder{
         System.arraycopy(body, index, bitmap, 0, 8);
         index += 8;
         char[] bits = bit2map(bitmap).toCharArray();
+        map.put("bitmap", new String(bits));
         for (int i = 0; i < bits.length; i++) {
             if (bits[i] != 49)
                 continue;
-            //todo 默认设置一个域
-            Field field = new Field();
+
+            Field field = getField(i + 1); //域属性
             if (field == null)
-                throw new RuntimeException("field error");
+                throw new RuntimeException("field error index = " + (i + 1));
+
+            if(i == 54) {
+                byte[] bytes = new byte[153];
+                System.arraycopy(body,index,bytes,0,153);
+                System.out.println(ByteUtil.bytes2hex(bytes));
+            }
+            if(i == 58) {
+                byte[] bytes = new byte[2];
+                System.arraycopy(body,index,bytes,0,2);
+                System.out.println(ByteUtil.bytes2hex(bytes));
+            }
 
             byte[] value;
             if (field.getVar() == VAR) { //变长域
                 byte[] len = new byte[field.getLength()]; //长度字节数
+                if ((i + 1) == SEC || (i + 1) == THRD) { //第二磁道和第三磁道特殊处理
+                    index += 1; //忽略数据开始标志位
+                }
                 System.arraycopy(body, index, len, 0, field.getLength());
-                value = new byte[Integer.parseInt(ByteUtil.bytes2bcd(len))]; //value值字节数
+                int varLength = getVarLength(len,field.getType());
+                value = new byte[varLength]; //value值字节数 由于一个字节为2位16进制数，所以长度要为字符串的一半
                 index += field.getLength();
             } else if (field.getVar() == STATIC) { //定长域
                 value = new byte[field.getVarLength()];
             } else {
-                throw new RuntimeException("");
+                throw new RuntimeException("unknow field type index = " + (i + 1));
             }
 
             System.arraycopy(body, index, value, 0, value.length);
@@ -70,23 +79,29 @@ public class BcomDecoder{
             String fieldValue;
             switch (field.getType()) { //value 类型
                 case ASCII:
-                    fieldValue = ByteUtil.bytes2ascii(value);
+                    fieldValue = getAsciiValue(value);
                     break;
                 case BCD:
-                    fieldValue = String.valueOf(ByteUtil.bytes2bcd(value));
+                    fieldValue = getBcdValue(value);
                     break;
                 case TLV:
-                    fieldValue = TlvDecoder.format(value);
+                    fieldValue = getTlvValue(value);
+                    break;
+                case ZZZ:
+                    fieldValue = getTrackValue(value, (i + 1));
+                    break;
+                case BIN:
+                    fieldValue = getBinValue(value);
                     break;
                 default:
-                    throw new RuntimeException("");
+                    throw new RuntimeException("unknow value type index = " + (i + 1));
             }
-            map.put("Filed" + i, fieldValue);
+        map.put(field.getName(), fieldValue);
         }
         return map;
     }
 
-    public static Map<String, String> parse(String str16) {
+    static Map<String, String> parse(String str16) {
         byte[] bytes = ByteUtil.hex2bytes(str16);
         return parse(bytes);
     }
@@ -117,29 +132,95 @@ public class BcomDecoder{
      * @param bytes
      * @return
      */
-    private static boolean checkLength(byte[] bytes) {
+    public static boolean checkLength(byte[] bytes) {
         byte[] head = new byte[2];
         System.arraycopy(bytes, 0, head, 0, 2);
         return ByteUtil.bytes2int(head) == (bytes.length - 2);
     }
 
-    public static void main(String[] args) {
-        /**
-         * 0166
-         * 00000001 01100110
-         * 2+4+32+64+128=230
-         */
-        String str16 = "00A660068800006040001804240200702406C024C0981D166258000000000253000000000000000115001726270407100001061220376258000000000253D2704201000004760000003030313932363736303030353633343233333332303739323932323031313536000000000000000024000000000000000013200000040006000016000000000000030200180010D2717312A2737E9377BC7E5C1A6F4C433546444244343032";
-        byte[] bytes = ByteUtil.hex2bytes(str16);
-        byte[] head = new byte[2];
-        System.arraycopy(bytes, 0, head, 0, 2);
-        System.out.println(ByteUtil.bytes2int(head));
-        System.out.println(bytes.length - 2);
-        if (checkLength(bytes)) {
-            System.out.println("length true");
+    /**
+     * 根据索引值得到field属性
+     *
+     * @param i
+     * @return
+     */
+    private static Field getField(int i) {
+        String k = String.valueOf(i);
+        String key;
+        if (k.length() < 3) {
+            key = "FIELD" + StringUtil.strCopy(k, "0", 3 - k.length(), false);
         } else {
-            System.out.println("length false");
+            key = "FIELD" + k;
+        }
+        return fieldMap.get(key);
+    }
+
+    /**
+     * 得到bcd value
+     *
+     * @param bytes
+     * @return
+     */
+    private static String getBcdValue(byte[] bytes) {
+        return ByteUtil.bytes2bcd(bytes);
+    }
+
+    /**
+     * 一磁 二磁 三磁数据
+     *
+     * @param bytes
+     * @return
+     */
+    private static String getTrackValue(byte[] bytes, int index) {
+        String track = ByteUtil.bytes2hex(bytes);
+        if (track != null && !track.equals("") && index == SEC) {
+            return track.replace("D", "=").replace("d", "=");
+        }
+        return track;
+    }
+
+    /**
+     * tlv 数据
+     *
+     * @param bytes
+     * @return
+     */
+    private static String getTlvValue(byte[] bytes) {
+        return TlvDecoder.format(bytes);
+    }
+
+    /**
+     * ascii数据
+     *
+     * @param bytes
+     * @return
+     */
+    private static String getAsciiValue(byte[] bytes) {
+        return ByteUtil.bytes2ascii(bytes);
+    }
+
+    private static String getBinValue(byte[] bytes) {
+        return ByteUtil.bytes2bin(bytes);
+    }
+
+    /**
+     * 变长域length 字节数
+     *
+     * @param bytes
+     * @return
+     */
+    private static int getVarLength(byte[] bytes,int type) {
+        int varLength = Integer.parseInt(ByteUtil.bytes2bcd(bytes));
+        if(BCD == type || ZZZ == type) {
+            varLength = varLength % 2 == 1 ? varLength + 1 : varLength; //如果长度是奇数，则左补0，长度加1
+            return varLength / 2; //字节数 = 字符数 / 2
+        } else {
+            return varLength;
         }
     }
+
+    public static void main(String[] args) {
+    }
+
 
 }

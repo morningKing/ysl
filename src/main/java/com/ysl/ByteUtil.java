@@ -70,16 +70,18 @@ public class ByteUtil {
      * @return
      */
     public static String bytes2bin(byte[] bytes) {
-        StringBuffer bin = new StringBuffer();
+        StringBuilder bin = new StringBuilder();
         for (int i = 0; i <= bytes.length - 1; i++) {
             int b = bytes[i];
             if (b < 0) {
                 b += 256; // 补码 负数 取模
             }
-            bin.append(Integer.toBinaryString(b));
-            while (bin.length() < 8) {
-                bin = bin.insert(0, "0");
+            StringBuilder sb = new StringBuilder();
+            sb.append(Integer.toBinaryString(b));
+            while (sb.length() < 8) {
+                sb = sb.insert(0, "0");
             }
+            bin.append(sb);
         }
         return bin.toString();
     }
@@ -114,27 +116,23 @@ public class ByteUtil {
         return Integer.parseInt(bin, 2);
     }
 
-    public static String bytes2tlv(byte[] bytes){
-
-        return null;
-    }
-
     /**
      * 12 34 hex
      * 0001 0010 0011 0100 原码
      * 18,52
      * 1234 8421码
      * 解析8421 bcd码 压缩版本
-     *
+     * 数字域，右靠齐，左边多余位填零；
      * @param bytes
      * @return
      */
     public static String bytes2bcd(byte[] bytes) {
-        String bcd = "";
-        String hex = bytes2hex(bytes);
-        if(hex != null && !hex.equals(""))
-            bcd = String.valueOf(Long.parseLong(hex));
-        return bcd;
+        StringBuffer bcd = new StringBuffer(bytes.length * 2);
+        for (int i = 0; i<bytes.length;i++){
+            bcd.append((byte)((bytes[i] & 0xF0) >>> 4));
+            bcd.append((byte)(bytes[i] & 0x0F));
+        }
+        return bcd.toString();
     }
 
     /**
@@ -161,6 +159,10 @@ public class ByteUtil {
         return ascii.toString();
     }
 
+
     public static void main(String[] args) {
+//        byte[] bytes = {85,65};
+//        System.out.println(bytes2hex(bytes));
+//        System.out.println(Integer.parseInt("01000001",2));
     }
 }
