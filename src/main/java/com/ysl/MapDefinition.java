@@ -10,7 +10,9 @@ public class MapDefinition {
 
     private static final String VAR3 = "VAR3"; //变长 3字节长度
 
-    public static Map<String, Field> definitionInit(String path) {
+    public static final Map<String,Field> mapField = definitionInit("src/main/resources/config_8583.properties");
+
+    private static Map<String, Field> definitionInit(String path) {
         File file = new File(path);
         if (!file.exists()) {
             throw new RuntimeException("8583 config file is not found");

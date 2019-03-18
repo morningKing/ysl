@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public class MapDefinitionTest {
      */
     @Test
     public void testDefinitionInit() throws Exception {
-        Map<String,Field> map = MapDefinition.definitionInit("src/test/resources/config_8583.properties");
+        Map<String,Field> map = MapDefinition.mapField;
         Set<String> set = map.keySet();
         for(String field : set){
             System.out.println(map.get(field).getName());

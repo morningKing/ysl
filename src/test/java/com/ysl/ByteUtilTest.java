@@ -13,12 +13,17 @@ import org.junit.After;
  */
 public class ByteUtilTest {
 
+    private long l;
+
     @Before
     public void before() throws Exception {
+        l = System.currentTimeMillis();
     }
 
     @After
     public void after() throws Exception {
+        l = System.currentTimeMillis() - l;
+        System.out.println("运行了" + l + "毫秒");
     }
 
     /**
@@ -27,7 +32,9 @@ public class ByteUtilTest {
     @Test
     public void testBytes2hex() throws Exception {
         byte[] bytes = {-1, -96}; //FFA0
-        System.out.println(ByteUtil.bytes2hex(bytes));
+        for (int i = 0; i <= 20000000; i++) {
+            ByteUtil.bytes2hex(bytes);
+        }
     }
 
     /**
@@ -61,8 +68,10 @@ public class ByteUtilTest {
      */
     @Test
     public void testBytes2bin() throws Exception {
-        byte[] bytes = {26};
-        System.out.println(ByteUtil.bytes2bin(bytes));
+        byte[] bytes = {-1, -96};
+        for (int i = 0; i <= 20000000; i++) {
+            ByteUtil.bytes2bin(bytes);
+        }
     }
 
     /**

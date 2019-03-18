@@ -17,11 +17,7 @@ public class BcomDecoder {
     private static final int SEC = 35;
     private static final int THRD = 36;
 
-    private static Map<String, Field> fieldMap;
-
-    static {
-        fieldMap = MapDefinition.definitionInit("src/main/resources/config_8583.properties");
-    }
+    private static Map<String, Field> fieldMap = MapDefinition.mapField;
 
     static Map<String, String> parse(byte[] body) {
 
@@ -33,11 +29,10 @@ public class BcomDecoder {
         map.put("mti", ByteUtil.bytes2hex(msi));
         index += 2;
 
-        //todo 先默认位图为8字节
-        byte[] bitmap = new byte[8];
+        byte[] bitmap = new byte[8]; //位图解析
         System.arraycopy(body, index, bitmap, 0, 8);
         index += 8;
-        char[] bits = bit2map(bitmap).toCharArray();
+        char[] bits = BitMapCache.getBitMap(bitmap).toCharArray();
         map.put("bitmap", new String(bits));
         for (int i = 0; i < bits.length; i++) {
             if (bits[i] != 49)
@@ -47,17 +42,6 @@ public class BcomDecoder {
             if (field == null)
                 throw new RuntimeException("field error index = " + (i + 1));
 
-            if(i == 54) {
-                byte[] bytes = new byte[153];
-                System.arraycopy(body,index,bytes,0,153);
-                System.out.println(ByteUtil.bytes2hex(bytes));
-            }
-            if(i == 58) {
-                byte[] bytes = new byte[2];
-                System.arraycopy(body,index,bytes,0,2);
-                System.out.println(ByteUtil.bytes2hex(bytes));
-            }
-
             byte[] value;
             if (field.getVar() == VAR) { //变长域
                 byte[] len = new byte[field.getLength()]; //长度字节数
@@ -65,7 +49,7 @@ public class BcomDecoder {
                     index += 1; //忽略数据开始标志位
                 }
                 System.arraycopy(body, index, len, 0, field.getLength());
-                int varLength = getVarLength(len,field.getType());
+                int varLength = getVarLength(len, field.getType());
                 value = new byte[varLength]; //value值字节数 由于一个字节为2位16进制数，所以长度要为字符串的一半
                 index += field.getLength();
             } else if (field.getVar() == STATIC) { //定长域
@@ -96,7 +80,7 @@ public class BcomDecoder {
                 default:
                     throw new RuntimeException("unknow value type index = " + (i + 1));
             }
-        map.put(field.getName(), fieldValue);
+            map.put(field.getName(), fieldValue);
         }
         return map;
     }
@@ -104,19 +88,6 @@ public class BcomDecoder {
     static Map<String, String> parse(String str16) {
         byte[] bytes = ByteUtil.hex2bytes(str16);
         return parse(bytes);
-    }
-
-    /**
-     * 解析位图
-     *
-     * @param bytes
-     * @return
-     */
-    private static String bit2map(byte[] bytes) {
-        if (bytes.length != 8 && bytes.length != 16) {
-            throw new RuntimeException("invalid bit map");
-        }
-        return ByteUtil.bytes2bin(bytes);
     }
 
     /**
@@ -199,6 +170,12 @@ public class BcomDecoder {
         return ByteUtil.bytes2ascii(bytes);
     }
 
+    /**
+     * 二进制数据
+     *
+     * @param bytes
+     * @return
+     */
     private static String getBinValue(byte[] bytes) {
         return ByteUtil.bytes2bin(bytes);
     }
@@ -209,9 +186,9 @@ public class BcomDecoder {
      * @param bytes
      * @return
      */
-    private static int getVarLength(byte[] bytes,int type) {
+    private static int getVarLength(byte[] bytes, int type) {
         int varLength = Integer.parseInt(ByteUtil.bytes2bcd(bytes));
-        if(BCD == type || ZZZ == type) {
+        if (BCD == type || ZZZ == type || BIN == type) { // bcd码和第三磁道
             varLength = varLength % 2 == 1 ? varLength + 1 : varLength; //如果长度是奇数，则左补0，长度加1
             return varLength / 2; //字节数 = 字符数 / 2
         } else {
