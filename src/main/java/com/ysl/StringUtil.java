@@ -8,9 +8,9 @@ public class StringUtil {
             stringBuilder.append(cp);
         }
         if (flag) {
-            return str + stringBuilder.toString();
+            return str + stringBuilder.toString(); //左靠右补cp
         } else {
-            return stringBuilder.toString() + str;
+            return stringBuilder.toString() + str; //右靠左补cp
         }
     }
 }

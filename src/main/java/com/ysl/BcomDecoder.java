@@ -14,10 +14,8 @@ public class BcomDecoder {
     public static final int ZZZ = 4;
     public static final int BIN = 5;
 
-    private static final int SEC = 35;
-    private static final int THRD = 36;
-
-    private static Map<String, Field> fieldMap = MapDefinition.mapField;
+    public static final int SEC = 35;
+    public static final int THRD = 36;
 
     static Map<String, String> parse(byte[] body) {
 
@@ -123,7 +121,7 @@ public class BcomDecoder {
         } else {
             key = "FIELD" + k;
         }
-        return fieldMap.get(key);
+        return MapDefinition.mapField.get(key);
     }
 
     /**

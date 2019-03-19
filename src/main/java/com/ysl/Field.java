@@ -22,7 +22,7 @@ public class Field {
         this.varLength = varLength;
     }
 
-    private int varLength;
+    private int varLength; //字节数
 
     public int getVar() {
         return var;
