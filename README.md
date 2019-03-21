@@ -14,6 +14,8 @@ ysl8583 实现了基本的ISO8583协议,适用于银联pos报文规范,当前版
 TPDU | 报文头
 ---|---
 ID(60H)，目的地址（NN NN），原地址（NN NN） | 应用类别定义（N2），软件版本号（N2），终端状态（N1）,处理要求（N1）,保留使用（N6）
+
+
 tpdu 定长10字节bcd码，压缩表5字节长度的数值。   
 报文头 定长12字节bcd码，压缩表6字节长度的数值。
 > 消息类型
@@ -70,7 +72,7 @@ System.out.println(map.toString());
 结果：
 {FIELD002=6258000000000196, FIELD003=000000, FIELD004=000000000002, FIELD011=001369, FIELD014=2704, FIELD022=0720, FIELD023=0001, FIELD025=00, FIELD035=6258000000000196=270420100000853000000, FIELD041=76000563, FIELD042=423332079292201, FIELD049=156, FIELD055={tag=[9f26]length=[8]value=[b1aad1cb0083b502]}{tag=[9f27]length=[1]value=[80]}{tag=[9f10]length=[19]value=[07010103a00000040a01000000000095de79d3]}{tag=[9f37]length=[4]value=[86f5fd32]}{tag=[9f36]length=[2]value=[0289]}{tag=[95]length=[5]value=[0000000000]}{tag=[9a]length=[3]value=[190227]}{tag=[9c]length=[1]value=[00]}{tag=[9f02]length=[6]value=[000000000002]}{tag=[5f2a]length=[2]value=[0156]}{tag=[82]length=[2]value=[7c00]}{tag=[9f1a]length=[2]value=[0156]}{tag=[9f33]length=[3]value=[e0f0c8]}{tag=[9f35]length=[1]value=[22]}{tag=[84]length=[8]value=[a000000333010102]}{tag=[9f09]length=[2]value=[0020]}{tag=[9f63]length=[16]value=[30343233333331300000000000000000]}{tag=[9f1e]length=[8]value=[3834373134363733]}{tag=[9f03]length=[6]value=[000000000000]}, FIELD059=A2050040000010484714673000196FECC9F02180424  , FIELD060=22000003000601, FIELD064=4146433431454230, bitmap=0111000000100100000001101000000000100000110000001000001000110001, head=604000180424, mti=0200, tpdu=6006880000}
 ```
-> 装包
+#### 装包
 ```
 HashMap<String,String> map = new HashMap<>();
         map.put("tpdu","6006880000");
