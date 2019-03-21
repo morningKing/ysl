@@ -175,7 +175,7 @@ public class BcomDecoder {
      * @return
      */
     private static String getBinValue(byte[] bytes) {
-        return ByteUtil.bytes2bin(bytes);
+        return ByteUtil.bytes2hex(bytes);
     }
 
     /**

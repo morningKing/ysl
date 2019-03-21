@@ -40,7 +40,7 @@ public class BcomEncoder {
                     fieldEntry = genBcdValue(map.get(key), field); //bcd码 长度字节数的一半
                     break;
                 case BcomDecoder.TLV:
-
+                    fieldEntry = getTlvValue(map.get(key), field);
                     break;
                 case BcomDecoder.ZZZ:
                     fieldEntry = getZZZValue(map.get(key), key, field); //接收字符串(字节字符/非16进制)
@@ -56,7 +56,7 @@ public class BcomEncoder {
             body.append(fieldEntry.getValue()); //拼接内容
         }
         String bits = BitMapCache.getBitMap(bitmap);
-        body.insert(0,bits);
+        body.insert(0, bits);
         return body.toString();
     }
 
@@ -174,6 +174,18 @@ public class BcomEncoder {
     }
 
     /**
+     * @param src
+     * @return
+     */
+    private static FieldEntry getTlvValue(String src, Field field) {
+        FieldEntry fieldEntry = new FieldEntry();
+        fieldEntry.setLen(src.length());
+        String count = String.valueOf(src.length() / 2);
+        fieldEntry.setLength(StringUtil.strCopy(count, "0", 4 - count.length(), false));
+        return null;
+    }
+
+    /**
      * field index FIELD001 -> 1
      *
      * @param key
@@ -191,10 +203,8 @@ public class BcomEncoder {
     }
 
     public static void main(String[] args) {
-//        String aa = "00000001";
-//        System.out.println(Integer.parseInt(aa,2));
-//        System.out.println(ByteUtil.dec2hex(Integer.parseInt(aa,2)));
-//        System.out.println(Integer.MAX_VALUE);
+        String str = "9F2608B1AAD1CB0083B5029F2701809F101307010103A00000040A01000000000095DE79D39F370486F5FD329F36020289950500000000009A031902279C01009F02060000000000025F2A02015682027C009F1A0201569F3303E0F0C89F3501228408A0000003330101029F090200209F6310303432333333313000000000000000009F1E0838343731343637339F0306000000000000";
+        System.out.println(genBcdLenth(str, 2, true));
     }
 
 }
