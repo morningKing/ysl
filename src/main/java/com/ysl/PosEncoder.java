@@ -43,6 +43,9 @@ public class PosEncoder {
         map.remove("mti");
         map.remove("tpdu");
         map.remove("head");
-        return mth + BcomEncoder.encode(map);
+        String content = mth + BcomEncoder.encode(map);
+        String length = ByteUtil.dec2hex(content.length() / 2);
+        length = StringUtil.strCopy(length,"0",4-length.length(),false);
+        return length + content;
     }
 }

@@ -69,9 +69,7 @@ public class ByteUtilTest {
     @Test
     public void testBytes2bin() throws Exception {
         byte[] bytes = {-1, -96};
-        for (int i = 0; i <= 20000000; i++) {
-            ByteUtil.bytes2bin(bytes);
-        }
+        System.out.println(ByteUtil.bytes2bin(bytes));
     }
 
     /**
@@ -80,7 +78,7 @@ public class ByteUtilTest {
     @Test
     public void testDec2hex() throws Exception {
 //        System.out.println(ByteUtil.dec2hex(328));
-        System.out.println(ByteUtil.dec2hex(323));
+        System.out.println(ByteUtil.dec2hex(100));
     }
 
     /**
