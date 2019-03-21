@@ -45,8 +45,8 @@ public class BcomEncoderTest {
     public void testEncode() throws Exception {
 //TODO: Test goes here...
         Map<String,String> map = new HashMap<>();
-//        map.put("FIELD042","423332079292201");
-//        map.put("FIELD041","76000563");
+        map.put("FIELD042","423332079292201");
+        map.put("FIELD041","76000563");
 //        map.put("FIELD002","6258000000000253");
 //        map.put("FIELD003","000000");
 //        map.put("FIELD048","999");

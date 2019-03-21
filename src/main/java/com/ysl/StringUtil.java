@@ -13,4 +13,8 @@ public class StringUtil {
             return stringBuilder.toString() + str; //右靠左补cp
         }
     }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.equals("");
+    }
 }
