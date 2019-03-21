@@ -130,6 +130,8 @@ public class BcomEncoder {
                     ascii = new StringBuilder(
                             StringUtil.strCopy(ascii.toString(), "0", sub, true)
                     );
+                }else if(bytes.length > field.getVarLength()) {
+                    throw new IllegalArgumentException("illegal field length ! the max length is " + field.getVarLength() + " but " + bytes.length + " bytes given");
                 }
                 fieldEntry.setLength("");
                 break;
