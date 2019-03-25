@@ -62,7 +62,7 @@ public class TlvEncoder {
                 break;
             case BcomDecoder.VAR:
                 if (src.length() > (unionField55Unit.getLength() * 2))
-                    throw new IllegalArgumentException("");
+                    throw new IllegalArgumentException("illegal field length ! the max length is " + unionField55Unit.getLength() * 2 + " but " + src.length() + " chars given");
                 break;
             default:
                 throw new IllegalArgumentException("unknown tlv field type " + unionField55Unit.getType());
@@ -87,7 +87,7 @@ public class TlvEncoder {
                 break;
             case BcomDecoder.VAR:
                 if (bytes.length > unionField55Unit.getLength())
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("illegal field length ! the max length is " + unionField55Unit.getLength() + " but " + bytes.length + " bytes given");
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -107,11 +107,11 @@ public class TlvEncoder {
         switch (unionField55Unit.getVar()) {
             case BcomDecoder.STATIC:
                 if (src.length() != (unionField55Unit.getLength() * 2))
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("the tlv field " + unionField55Unit.getTag() + " needs " + unionField55Unit.getLength() * 2 + " chars but " + src.length() + " given");
                 break;
             case BcomDecoder.VAR:
                 if (src.length() > (unionField55Unit.getLength() * 2))
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("illegal field length ! the max length is " + unionField55Unit.getLength() * 2 + " but " + src.length() + " chars given");
                 break;
             default:
                 throw new IllegalArgumentException();

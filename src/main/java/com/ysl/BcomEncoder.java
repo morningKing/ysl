@@ -49,7 +49,7 @@ public class BcomEncoder {
 
                     break;
                 default:
-                    throw new RuntimeException("unknow value type index = " + field.getName() + " type = " + field.getType());
+                    throw new RuntimeException("unknown value type index = " + field.getName() + " type = " + field.getType());
             }
 
             body.append(fieldEntry.getLength()); //拼接长度
@@ -103,6 +103,9 @@ public class BcomEncoder {
                 } else {
                     fieldEntry.setValue(src);
                 }
+                break;
+            default:
+                throw new IllegalArgumentException("unknown field type " + field.getVar() + " please check config_8583.properties");
         }
         return fieldEntry;
     }
@@ -130,7 +133,7 @@ public class BcomEncoder {
                     ascii = new StringBuilder(
                             StringUtil.strCopy(ascii.toString(), "0", sub, true)
                     );
-                }else if(bytes.length > field.getVarLength()) {
+                } else if (bytes.length > field.getVarLength()) {
                     throw new IllegalArgumentException("illegal field length ! the max length is " + field.getVarLength() + " but " + bytes.length + " bytes given");
                 }
                 fieldEntry.setLength("");
@@ -140,7 +143,7 @@ public class BcomEncoder {
                 fieldEntry.setLength(genBcdLenth(src, field.getLength(), true));
                 break;
             default:
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException("unknown field type " + field.getVar() + " please check config_8583.properties");
         }
 
         fieldEntry.setValue(ascii.toString());
@@ -205,8 +208,6 @@ public class BcomEncoder {
     }
 
     public static void main(String[] args) {
-        String str = "9F2608B1AAD1CB0083B5029F2701809F101307010103A00000040A01000000000095DE79D39F370486F5FD329F36020289950500000000009A031902279C01009F02060000000000025F2A02015682027C009F1A0201569F3303E0F0C89F3501228408A0000003330101029F090200209F6310303432333333313000000000000000009F1E0838343731343637339F0306000000000000";
-        System.out.println(genBcdLenth(str, 2, true));
     }
 
 }

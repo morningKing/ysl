@@ -34,7 +34,7 @@ public class TlvEncoderTest {
 //        map.put("9F27","80");
 //        map.put("9F10","07010103A00000040A01000000000095DE79D3");
 //        map.put("9F37","86F5FD32");
-        map.put("9F1E","847146");
+        map.put("9F1E","84714622");
         System.out.println(TlvEncoder.encode(map));
 //TODO: Test goes here... 
     }
