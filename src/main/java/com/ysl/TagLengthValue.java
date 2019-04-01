@@ -31,6 +31,6 @@ public class TagLengthValue {
 
     @Override
     public String toString() {
-        return "{tag=[" + tag + "]" + "length=[" + len + "]" + "value=[" + value + "]}";
+        return "{tag=[" + tag + "]," + "length=[" + len + "]," + "value=[" + value + "]}";
     }
 }

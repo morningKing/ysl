@@ -10,7 +10,7 @@ public class MapDefinition {
 
     private static final String VAR3 = "VAR3"; //变长 3字节长度
 
-    public static final Map<String,Field> mapField = definitionInit("src/main/resources/config_8583.properties");
+    public static final Map<String, Field> mapField = definitionInit("src/main/resources/config_8583.properties");
 
     private static Map<String, Field> definitionInit(String path) {
         File file = new File(path);
@@ -50,27 +50,6 @@ public class MapDefinition {
                         field.setVarLength(tmp);
                     }
                 }
-
-                switch (vals[2].trim()) {
-                    case "bcd":
-                        field.setType(BcomDecoder.BCD);
-                        break;
-                    case "asc":
-                        field.setType(BcomDecoder.ASCII);
-                        break;
-                    case "tlv":
-                        field.setType(BcomDecoder.TLV);
-                        break;
-                    case "zzz":
-                        field.setType(BcomDecoder.ZZZ);
-                        break;
-                    case "bin":
-                        field.setType(BcomDecoder.BIN);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("unknow value type");
-                }
-
                 fieldMap.put(field.getName(), field);
             }
         } catch (Exception e) {
