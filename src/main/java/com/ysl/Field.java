@@ -1,10 +1,15 @@
 package com.ysl;
-
+/**
+ * 描述：config_8583.properties对应的实体
+ * 时间：2019-04-28 13:55:11
+ * author: jinjie
+ */
 public class Field {
     private int var;
     private int length;
     private int type;
     private String name;
+    private int varLength; //字节数
 
     public String getName() {
         return name;
@@ -21,8 +26,6 @@ public class Field {
     public void setVarLength(int varLength) {
         this.varLength = varLength;
     }
-
-    private int varLength; //字节数
 
     public int getVar() {
         return var;
