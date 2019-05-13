@@ -99,7 +99,7 @@ public class BcomEncoder {
                 fieldEntry.setLen(src.length());
                 fieldEntry.setLength(genBcdLenth(src, field.getLength(), true));
                 if (src.length() % 2 == 1) {
-                    fieldEntry.setValue("0" + src);
+                    fieldEntry.setValue(src + "0"); //左靠右补零
                 } else {
                     fieldEntry.setValue(src);
                 }
