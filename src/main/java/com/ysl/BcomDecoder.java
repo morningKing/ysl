@@ -41,13 +41,16 @@ public class BcomDecoder {
                 throw new RuntimeException("field error index = " + (i + 1));
 
             byte[] value;
+            int varLength = 0;
+            boolean flag = false;
             if (field.getVar() == VAR) { //变长域
                 byte[] len = new byte[field.getLength()]; //长度字节数
                 if ((i + 1) == SEC || (i + 1) == THRD) { //第二磁道和第三磁道特殊处理
                     index += 1; //忽略数据开始标志位
                 }
                 System.arraycopy(body, index, len, 0, field.getLength());
-                int varLength = getVarLength(len, field.getType());
+                flag = isJiOu(len);
+                varLength = getVarLength(len, field.getType());
                 value = new byte[varLength]; //value值字节数 由于一个字节为2位16进制数，所以长度要为字符串的一半
                 index += field.getLength();
             } else if (field.getVar() == STATIC) { //定长域
@@ -64,7 +67,7 @@ public class BcomDecoder {
                     fieldValue = getAsciiValue(value);
                     break;
                 case BCD:
-                    fieldValue = getBcdValue(value);
+                    fieldValue = getBcdValue(value,flag);
                     break;
                 case TLV:
                     fieldValue = getTlvValue(value);
@@ -128,10 +131,14 @@ public class BcomDecoder {
      * 得到bcd value
      *
      * @param bytes
+     * @param flag
      * @return
      */
-    private static String getBcdValue(byte[] bytes) {
-        return ByteUtil.bytes2bcd(bytes);
+    private static String getBcdValue(byte[] bytes, boolean flag) {
+        if (!flag) //定长域 或者 非补零变长
+            return ByteUtil.bytes2bcd(bytes);
+        String bcd = ByteUtil.bytes2bcd(bytes);
+        return bcd.substring(0, bcd.length() - 1);
     }
 
     /**
@@ -194,8 +201,15 @@ public class BcomDecoder {
         }
     }
 
-    public static void main(String[] args) {
+    private static boolean isJiOu(byte[] bytes) {
+        int varLength = Integer.parseInt(ByteUtil.bytes2bcd(bytes));
+        if(varLength % 2 == 1) { //true 奇数
+            return true;
+        } else {
+            return false; // false 偶数
+        }
     }
 
-
+    public static void main(String[] args) {
+    }
 }

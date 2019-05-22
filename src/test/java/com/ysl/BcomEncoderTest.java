@@ -60,6 +60,8 @@ public class BcomEncoderTest {
         map.put("FIELD061","0000000000000302");
         map.put("FIELD062","金杰是我aa!@#");
         System.out.println(BcomEncoder.encode(map));
+//        ByteUtil.hex2bytes()
+//        System.out.println("".getBytes());
 /* 
 try { 
    Method method = BcomEncoder.getClass().getMethod("encode", Map<String,.class); 
