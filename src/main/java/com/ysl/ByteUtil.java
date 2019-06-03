@@ -132,6 +132,9 @@ public class ByteUtil {
             bcd.append((byte)((bytes[i] & 0xF0) >>> 4));
             bcd.append((byte)(bytes[i] & 0x0F));
         }
+        if(bcd.length() > (bytes.length * 2)) {
+            throw new RuntimeException("Illegal bcd byte code " + printByte(bytes));
+        }
         return bcd.toString();
     }
 
@@ -159,10 +162,15 @@ public class ByteUtil {
         return ascii.toString();
     }
 
+    public static String printByte(byte[] bytes){
+        String[] bytess = new String[bytes.length];
+        for(int i = 0; i<bytes.length;i++) {
+            bytess[i] = String.valueOf((int)bytes[i]);
+        }
+        return String.join(",",bytess);
+    }
+
 
     public static void main(String[] args) {
-//        byte[] bytes = {85,65};
-//        System.out.println(bytes2hex(bytes));
-//        System.out.println(Integer.parseInt("01000001",2));
     }
 }
