@@ -157,7 +157,10 @@ public class ByteUtil {
     public static String bytes2ascii(byte[] bytes) {
         StringBuilder ascii = new StringBuilder();
         for (byte b : bytes) {
-            ascii.append((char) (b & 0xFF));
+            //修改前
+//            ascii.append((char) (b & 0xFF));
+            //修改后
+            ascii.append(Integer.toHexString(b & 0xFF));
         }
         return ascii.toString();
     }
