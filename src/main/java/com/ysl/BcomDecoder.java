@@ -3,7 +3,7 @@ package com.ysl;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class BcomDecoder {
+public class BcomDecoder extends Decoder{
 
     public static final int VAR = 1;
     public static final int STATIC = 0;
@@ -13,9 +13,6 @@ public class BcomDecoder {
     public static final int TLV = 3;
     public static final int ZZZ = 4;
     public static final int BIN = 5;
-
-    public static final int SEC = 35;
-    public static final int THRD = 36;
 
     static Map<String, String> parse(byte[] body) {
 
@@ -125,64 +122,6 @@ public class BcomDecoder {
             key = "FIELD" + k;
         }
         return MapDefinition.mapField.get(key);
-    }
-
-    /**
-     * 得到bcd value
-     *
-     * @param bytes
-     * @param flag
-     * @return
-     */
-    private static String getBcdValue(byte[] bytes, boolean flag) {
-        if (!flag) //定长域 或者 非补零变长
-            return ByteUtil.bytes2bcd(bytes);
-        String bcd = ByteUtil.bytes2bcd(bytes);
-        return bcd.substring(0, bcd.length() - 1);
-    }
-
-    /**
-     * 一磁 二磁 三磁数据
-     *
-     * @param bytes
-     * @return
-     */
-    private static String getTrackValue(byte[] bytes, int index) {
-        String track = ByteUtil.bytes2hex(bytes);
-        if (track != null && !track.equals("") && index == SEC) {
-            return track.replace("D", "=").replace("d", "=");
-        }
-        return track;
-    }
-
-    /**
-     * tlv 数据
-     *
-     * @param bytes
-     * @return
-     */
-    private static String getTlvValue(byte[] bytes) {
-        return TlvDecoder.format(bytes);
-    }
-
-    /**
-     * ascii数据
-     *
-     * @param bytes
-     * @return
-     */
-    private static String getAsciiValue(byte[] bytes) {
-        return ByteUtil.bytes2ascii(bytes);
-    }
-
-    /**
-     * 二进制数据
-     *
-     * @param bytes
-     * @return
-     */
-    private static String getBinValue(byte[] bytes) {
-        return ByteUtil.bytes2hex(bytes);
     }
 
     /**
