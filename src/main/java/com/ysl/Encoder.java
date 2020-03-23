@@ -73,9 +73,9 @@ public abstract class Encoder {
             case BcomDecoder.STATIC:
                 fieldEntry.setLen(field.getVarLength());
                 if (bytes.length < field.getVarLength()) { //定长 非数字域 左靠齐 右补0
-                    int sub = (field.getVarLength() - bytes.length) * 2;
+                    int sub = (field.getVarLength() - bytes.length);
                     ascii = new StringBuilder(
-                            StringUtil.strCopy(ascii.toString(), "0", sub, true)
+                            StringUtil.strCopy(ascii.toString(), "31", sub, true)
                     );
                 } else if (bytes.length > field.getVarLength()) {
                     throw new IllegalArgumentException("illegal field length ! the max length is " + field.getVarLength() + " but " + bytes.length + " bytes given");
