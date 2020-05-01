@@ -69,7 +69,8 @@ public class BcomEncoder extends Encoder{
         fieldEntry.setLen(src.length());
         String count = String.valueOf(src.length() / 2);
         fieldEntry.setLength(StringUtil.strCopy(count, "0", 4 - count.length(), false));
-        return null;
+        fieldEntry.setValue(src);
+        return fieldEntry;
     }
 
 }

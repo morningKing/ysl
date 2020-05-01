@@ -1,9 +1,13 @@
 package com.ysl;
 
+import com.ysl.handler.Handler;
+import com.ysl.handler.ValueArg;
+import com.ysl.handler.ValueHandlerHolder;
+
 import java.util.Map;
 import java.util.TreeMap;
 
-public class BcomDecoder extends Decoder{
+public class BcomDecoder extends Decoder {
 
     public static final int VAR = 1;
     public static final int STATIC = 0;
@@ -14,7 +18,9 @@ public class BcomDecoder extends Decoder{
     public static final int ZZZ = 4;
     public static final int BIN = 5;
 
-    static Map<String, String> parse(byte[] body) {
+    private static Handler handler = ValueHandlerHolder.getInstance();
+
+    public Map<String, String> parse(byte[] body) {
 
         Map<String, String> map = new TreeMap<>();
 
@@ -29,6 +35,9 @@ public class BcomDecoder extends Decoder{
         index += 8;
         char[] bits = BitMapCache.getBitMap(bitmap).toCharArray();
         map.put("bitmap", new String(bits));
+
+        ValueArg valueArg = new ValueArg();
+
         for (int i = 0; i < bits.length; i++) {
             if (bits[i] != 49)
                 continue;
@@ -58,34 +67,20 @@ public class BcomDecoder extends Decoder{
 
             System.arraycopy(body, index, value, 0, value.length);
             index += value.length;
-            String fieldValue;
-            switch (field.getType()) { //value 类型
-                case ASCII:
-                    fieldValue = getAsciiValue(value);
-                    break;
-                case BCD:
-                    fieldValue = getBcdValue(value,flag);
-                    break;
-                case TLV:
-                    fieldValue = getTlvValue(value);
-                    break;
-                case ZZZ:
-                    fieldValue = getTrackValue(value, (i + 1));
-                    break;
-                case BIN:
-                    fieldValue = getBinValue(value);
-                    break;
-                default:
-                    throw new RuntimeException("unknow value type index = " + (i + 1));
-            }
-            map.put(field.getName(), fieldValue);
+
+            valueArg.setBytes(value);
+            valueArg.setFlag(flag);
+            valueArg.setIndex(i);
+            valueArg.setType(field.getType());
+            map.put(field.getName(), handler.handle(valueArg));
         }
+        valueArg = null;
         return map;
     }
 
-    static Map<String, String> parse(String str16) {
+     public Map<String, String> parse(String str16) {
         byte[] bytes = ByteUtil.hex2bytes(str16);
-        return parse(bytes);
+        return this.parse(bytes);
     }
 
     /**
@@ -142,7 +137,7 @@ public class BcomDecoder extends Decoder{
 
     private static boolean isJiOu(byte[] bytes) {
         int varLength = Integer.parseInt(ByteUtil.bytes2bcd(bytes));
-        if(varLength % 2 == 1) { //true 奇数
+        if (varLength % 2 == 1) { //true 奇数
             return true;
         } else {
             return false; // false 偶数

@@ -6,8 +6,10 @@ import java.util.TreeMap;
 public class PosDecoder {
 
     private static volatile PosDecoder posDecoder;
+    private BcomDecoder bcomDecoder;
 
     private PosDecoder() {
+        bcomDecoder = new BcomDecoder();
     }
 
     /**
@@ -48,7 +50,7 @@ public class PosDecoder {
         map.put("head",ByteUtil.bytes2bcd(head));
         byte[] body = new byte[bytes.length - 13];
         System.arraycopy(bytes, 13, body, 0, bytes.length - 13);
-        Map<String, String> bodyMap = BcomDecoder.parse(body);
+        Map<String, String> bodyMap = bcomDecoder.parse(body);
 
         map.putAll(bodyMap);
         return map;

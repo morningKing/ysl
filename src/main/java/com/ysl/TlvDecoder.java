@@ -8,7 +8,7 @@ public class TlvDecoder {
     public static List<TagLengthValue> parse(byte[] bytes) {
         List<TagLengthValue> list = new ArrayList<>();
         int index = 0;
-        for (;index != bytes.length ; ) { //index 数组当前下标
+        for (; index != bytes.length; ) { //index 数组当前下标
             TagLengthValue tlv = new TagLengthValue();
             int tagLength;
             if ((bytes[index] & 0x1F) == 31) {
@@ -37,10 +37,10 @@ public class TlvDecoder {
                 throw new RuntimeException("tvl length should be limit 1 ~ 3 byte");
             }
             tlv.setLen(String.valueOf(ByteUtil.bytes2int(keys)));
-            byte[] value = new byte[Integer.valueOf(tlv.getLen())];
-            System.arraycopy(bytes, index, value, 0, Integer.valueOf(tlv.getLen()));
+            byte[] value = new byte[Integer.parseInt(tlv.getLen())];
+            System.arraycopy(bytes, index, value, 0, Integer.parseInt(tlv.getLen()));
             tlv.setValue(ByteUtil.bytes2hex(value));
-            index += Integer.valueOf(tlv.getLen());
+            index += Integer.parseInt(tlv.getLen());
             list.add(tlv);
         }
         return list;
