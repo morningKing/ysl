@@ -42,12 +42,12 @@ public class BcomDecoder extends Decoder {
             if (bits[i] != 49)
                 continue;
 
-            Field field = getField(i + 1); //域属性
+            Field field = MapDefinition.getField(i + 1); //域属性
             if (field == null)
                 throw new RuntimeException("field error index = " + (i + 1));
 
             byte[] value;
-            int varLength = 0;
+            int varLength;
             boolean flag = false;
             if (field.getVar() == VAR) { //变长域
                 byte[] len = new byte[field.getLength()]; //长度字节数
@@ -103,23 +103,6 @@ public class BcomDecoder extends Decoder {
     }
 
     /**
-     * 根据索引值得到field属性
-     *
-     * @param i
-     * @return
-     */
-    private static Field getField(int i) {
-        String k = String.valueOf(i);
-        String key;
-        if (k.length() < 3) {
-            key = "FIELD" + StringUtil.strCopy(k, "0", 3 - k.length(), false);
-        } else {
-            key = "FIELD" + k;
-        }
-        return MapDefinition.mapField.get(key);
-    }
-
-    /**
      * 变长域length 字节数
      *
      * @param bytes
@@ -137,13 +120,7 @@ public class BcomDecoder extends Decoder {
 
     private static boolean isJiOu(byte[] bytes) {
         int varLength = Integer.parseInt(ByteUtil.bytes2bcd(bytes));
-        if (varLength % 2 == 1) { //true 奇数
-            return true;
-        } else {
-            return false; // false 偶数
-        }
+        return varLength % 2 == 1;
     }
 
-    public static void main(String[] args) {
-    }
 }

@@ -173,7 +173,4 @@ public class ByteUtil {
         return String.join(",",bytess);
     }
 
-
-    public static void main(String[] args) {
-    }
 }

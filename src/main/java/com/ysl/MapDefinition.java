@@ -79,4 +79,21 @@ public class MapDefinition {
         }
         return fieldMap;
     }
+
+    /**
+     * 根据索引值得到field属性
+     *
+     * @param i
+     * @return
+     */
+    public static Field getField(int i) {
+        String k = String.valueOf(i);
+        String key;
+        if (k.length() < 3) {
+            key = "FIELD" + StringUtil.strCopy(k, "0", 3 - k.length(), false);
+        } else {
+            key = "FIELD" + k;
+        }
+        return mapField.get(key);
+    }
 }
