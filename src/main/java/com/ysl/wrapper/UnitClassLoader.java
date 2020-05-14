@@ -21,9 +21,7 @@ public class UnitClassLoader {
                 assert files != null;
                 for (File f : files) {
                     Class clz = Class.forName(WRAPPER_PATH + "." + f.getName().replace(".class", ""));
-                    if (!Arrays.stream(clz.getAnnotations()).noneMatch(annotation -> {
-                        return (annotation instanceof UnitWrapper);
-                    })) {
+                    if (!Arrays.stream(clz.getAnnotations()).noneMatch(annotation -> (annotation instanceof UnitWrapper))) {
                         UnitWrapper wrapper = (UnitWrapper) clz.getAnnotation(UnitWrapper.class);
                         try {
                             WrapperHolder.wrappers[wrapper.unit() - 1] = (Wrapper) clz.newInstance();

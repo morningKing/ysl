@@ -48,7 +48,6 @@ public class PosDecoderAdapter implements DecoderAdapter {
         Map<String, String> map = PosDecoder.getInstance().parse(content);
         try {
             obj = clz.newInstance();
-
             for (Field field : clz.getDeclaredFields()) {
                 field.setAccessible(true);
                 for (Annotation annotation : field.getAnnotations()) {
