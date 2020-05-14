@@ -4,40 +4,35 @@ import java.util.Map;
 
 public class PosEncoder {
 
-    private static volatile PosEncoder posEncoder;
-
     private PosEncoder() {
     }
 
+    private static class PosEncoderHolder {
+        private static PosEncoder posEncoder = new PosEncoder();
+    }
+
     public static PosEncoder getInstance() {
-        if (posEncoder == null) {
-            synchronized (PosEncoder.class) {
-                if (posEncoder == null) {
-                    posEncoder = new PosEncoder();
-                }
-            }
-        }
-        return posEncoder;
+        return PosEncoderHolder.posEncoder;
     }
 
     public static String encode(Map<String, String> map) {
         if (StringUtil.isEmpty(map.get("mti"))) {
-            throw new IllegalArgumentException("message type identify is null !");
+            throw new IllegalArgumentException("Message type identify is null !");
         }
         if (ByteUtil.hex2bytes(map.get("mti")).length != 2) {
-            throw new IllegalArgumentException("message type must be 2 bytes but " + ByteUtil.hex2bytes(map.get("mti")).length + " given");
+            throw new IllegalArgumentException("Message type must be 2 bytes but " + ByteUtil.hex2bytes(map.get("mti")).length + " given");
         }
         if (StringUtil.isEmpty(map.get("tpdu"))) {
-            throw new IllegalArgumentException("tpdu is null !");
+            throw new IllegalArgumentException("Tpdu is null !");
         }
         if (ByteUtil.hex2bytes(map.get("tpdu")).length != 5) {
-            throw new IllegalArgumentException("tpdu must be 5 bytes but " + ByteUtil.hex2bytes(map.get("tpdu")).length + " given");
+            throw new IllegalArgumentException("Tpdu must be 5 bytes but " + ByteUtil.hex2bytes(map.get("tpdu")).length + " given");
         }
         if (StringUtil.isEmpty(map.get("head"))) {
             throw new IllegalArgumentException("message head is null !");
         }
         if (ByteUtil.hex2bytes(map.get("head")).length != 6) {
-            throw new IllegalArgumentException("head must be 6 bytes but " + ByteUtil.hex2bytes(map.get("head")).length + " given");
+            throw new IllegalArgumentException("Head must be 6 bytes but " + ByteUtil.hex2bytes(map.get("head")).length + " given");
         }
         String mth = map.get("tpdu") + map.get("head") + map.get("mti");
         map.remove("mti");
@@ -45,7 +40,7 @@ public class PosEncoder {
         map.remove("head");
         String content = mth + BcomEncoder.encode(map);
         String length = ByteUtil.dec2hex(content.length() / 2);
-        length = StringUtil.strCopy(length,"0",4-length.length(),false);
+        length = StringUtil.strCopy(length, "0", 4 - length.length(), false);
         return length + content;
     }
 }

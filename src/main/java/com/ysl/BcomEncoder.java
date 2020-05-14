@@ -3,10 +3,8 @@ package com.ysl;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class BcomEncoder extends Encoder{
+public class BcomEncoder extends Encoder {
 
     static String encode(Map<String, String> map) {
         if (!(map instanceof TreeMap)) {
