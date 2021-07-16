@@ -173,4 +173,7 @@ public class ByteUtil {
         return String.join(",",bytess);
     }
 
+    public static int hex2dec(String hex){
+        return Integer.parseInt(hex,16);
+    }
 }
